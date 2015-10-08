@@ -611,15 +611,6 @@ strong {
   padding: 0 20px;
 }
 
-.wrapperctr {
-  max-width: 650px;
-  margin: 0 auto;
-  position: relative;
-  text-align: center;
-  padding: 0 20px;
-}
-
-
 section img {
   max-width: 100%;
 }
@@ -827,6 +818,28 @@ section #title .credits.left {
 }
 section #title .credits.right {
   float: right;
+}
+
+section #project {
+  border: 0;
+  outline: none;
+  margin: 0 0 50px 0;
+  padding: 0 0 5px 0;
+}
+section #project h1 {
+  font-family: 'OpenSansLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  font-size: 28px;
+  color: #e8e8ff;
+  text-align: center;
+  line-height: 36px;
+}
+section #project p {
+  color: #d7cfbe;
+  font-family: 'OpenSansLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  font-size: 18px;
+  text-align: center;
 }
 
 @media print, screen and (max-width: 720px) {
