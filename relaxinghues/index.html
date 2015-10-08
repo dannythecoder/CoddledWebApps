@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
     <meta charset="utf-8">
-    <title>Resize HTML5 canvas dynamically | www.htmlcheats.com</title>
+    <title>Relaxing Hues - CoddledSoftware.com</title>
 <style>
 html, body {
 width: 100%;
@@ -20,6 +20,44 @@ display: block;  /* No floating content on sides */
 </canvas>
 
 <script>
+// Context for drawing
+var htmlCanvas = document.getElementById('c');
+var context = htmlCanvas.getContext('2d');
+var curRed = 0x00
+var curBlue = 0x00
+var curGreen = 0x00
+
+// Redraw method
+function redraw() {
+// Calculate the main color
+var currentHue = "#" + ((curBlue & 0x0000FF) | ((curGreen << 8) & 0x00FF00) | ((curRed << 16) & 0xFF0000)).toString(16)
+
+// Draw next frame
+context.strokeStyle = currentHue;
+context.fillStyle = currentHue;
+context.lineWidth = '10';
+//context.strokeRect(0, 0, window.innerWidth, window.innerHeight);
+context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+// Update state
+curRed += 1;
+curBlue += 2;
+curGreen += 3;
+}
+
+// Key Down handler
+function doKeyDown(e) {
+  if(e.keyCode==37){
+    // Left Arrow
+    curRed = 0;
+  }
+  else if(e.keyCode==39){
+    // Right Arrow
+    curBlue = 0;
+  }
+}
+
+// Add a handler to resize when necessary
 setupAutoResize();
 </script>
 

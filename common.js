@@ -1,5 +1,6 @@
 
 // Call this method to setup the auto-resize functionality.
+// The caller must provide a redraw() function and a doKeyDown() function
 function setupAutoResize() {
 var
 // Obtain a reference to the canvas element
@@ -20,11 +21,15 @@ function initialize() {
 window.addEventListener('resize', resizeCanvas, false);
 // Draw canvas border for the first time.
 resizeCanvas();
+// Also setup a key listener
+window.addEventListener("keydown",doKeyDown,false);
+// Also setup a timer to redraw()
+timer = setInterval(redraw, 33);
 }
 // Display custom canvas.
 // In this case it's a blue, 5 pixel border that
 // resizes along with the browser window.
-function redraw() {
+function redrawDefault() {
 context.strokeStyle = 'blue';
 context.lineWidth = '5';
 context.strokeRect(0, 0, window.innerWidth, window.innerHeight);
