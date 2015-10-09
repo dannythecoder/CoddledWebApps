@@ -1,48 +1,57 @@
+// common.js
+// Written by Danny F. Caudill (DannyTheCoder)
+//
+// Oct 8, 2015
+//
 
-// Call this method to setup the auto-resize functionality.
-// The caller must provide a redraw() function and a doKeyDown() function
-function setupAutoResize() {
-var
-// Obtain a reference to the canvas element
-// using its id.
-htmlCanvas = document.getElementById('c'),
-   // Obtain a graphics context on the
-   // canvas element for drawing.
-   context = htmlCanvas.getContext('2d');
+// startCanvas()
+//
+// Call this method to setup all the standard things that a full-screen
+// web app would need.  Before calling this method, be sure that the following
+// functions are defined.
+//
+// redraw() - redraw the canvas content.
+// doKeyDown(e) - Handler for keydown events.
+//
+function startCanvas() {
 
-// Start listening to resize events and
-// draw canvas.
+// Get canvas and context
+var htmlCanvas = document.getElementById('c'),
+    context = htmlCanvas.getContext('2d');
+
+// Configure listeners
 initialize();
 
 function initialize() {
-// Register an event listener to
-// call the resizeCanvas() function each time
-// the window is resized.
-window.addEventListener('resize', resizeCanvas, false);
-// Draw canvas border for the first time.
-resizeCanvas();
-// Also setup a key listener
-window.addEventListener("keydown",doKeyDown,false);
-// Also setup a timer to redraw()
-timer = setInterval(redraw, 33);
+    // Register resize listener
+    window.addEventListener('resize', resizeCanvas, false);
+
+    // Call the handler for the first time
+    resizeCanvas();
+
+    // Register a key listener
+    window.addEventListener("keydown",doKeyDown,false);
+
+    // Setup a 30fps timer to redraw
+    timer = setInterval(redraw, 33);
 }
-// Display custom canvas.
-// In this case it's a blue, 5 pixel border that
-// resizes along with the browser window.
+
+// Provide a default redraw() method that a caller-supplied redraw() could
+// call.
 function redrawDefault() {
-context.strokeStyle = 'blue';
-context.lineWidth = '5';
-context.strokeRect(0, 0, window.innerWidth, window.innerHeight);
+    context.strokeStyle = 'blue';
+    context.lineWidth = '5';
+    context.strokeRect(0, 0, window.innerWidth, window.innerHeight);
 }
-// Runs each time the DOM window resize event fires.
-// Resets the canvas dimensions to match window,
-// then draws the new borders accordingly.
+
+// Handler for resize events
 function resizeCanvas() {
-htmlCanvas.width = window.innerWidth;
-htmlCanvas.height = window.innerHeight;
-redraw();
+    htmlCanvas.width = window.innerWidth;
+    htmlCanvas.height = window.innerHeight;
+    redraw();
 }
-}
+
+} // end startCanvas
 
 
 
