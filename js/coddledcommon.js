@@ -1,18 +1,23 @@
-// common.js
-// Written by Danny F. Caudill (DannyTheCoder)
-//
-// Oct 8, 2015
-//
+/**
+ * @fileoverview Common methods for Coddled Software's web apps.
+ * @author Danny F. Caudill (DannyTheCoder)
+ *
+ *           Copyright Danny Caudill 2015.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 
-// startCanvas()
-//
-// Call this method to setup all the standard things that a full-screen
-// web app would need.  Before calling this method, be sure that the following
-// functions are defined.
-//
-// redraw() - redraw the canvas content.
-// doKeyDown(e) - Handler for keydown events.
-//
+
+/**
+ * Call this method to setup all the standard things that a full-screen
+ * web app would need.  Before calling this method, be sure that the following
+ * functions are defined.
+ *
+ * redraw() - redraw the canvas content.
+ * doKeyDown(e) - Handler for keydown events.
+ *
+ */
 function startCanvas() {
 
 // Get canvas and context

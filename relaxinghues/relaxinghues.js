@@ -6,13 +6,9 @@
 
 function createAppState() {
     var colorState = {
-        curRed: 0x00,
-        curBlue: 0x33,
-        curGreen: 0x11,
-        dirRed: 1,
-        dirBlue: 1,
-        dirGreen: 1,
-        maxVal: 0xFF,
+        curColor: [0x00, 0x33, 0x11],
+        curDir: [1, 1, 1],
+        maxVal: 0xFF
     };
 
     return colorState;
@@ -20,43 +16,32 @@ function createAppState() {
 
 function updateColorState() {
 
-colorState.curRed += (1 * colorState.dirRed);
-colorState.curBlue += (2 * colorState.dirBlue);
-colorState.curGreen += (3 * colorState.dirGreen);
+    var len = colorState.curColor.length;
 
-if (colorState.curRed > colorState.maxVal) {
-    colorState.dirRed = -1;
-    colorState.curRed = colorState.maxVal;
-}
-if (colorState.curBlue > colorState.maxVal) {
-    colorState.dirBlue = -1;
-    colorState.curBlue = colorState.maxVal;
-}
-if (colorState.curGreen > colorState.maxVal) {
-    colorState.dirGreen = -1;
-    colorState.curGreen = colorState.maxVal;
-}
+    for (var i = 0; i < len; i++) {
+        // Calculate the new color
+        colorState.curColor[i] += ((i + 1) * colorState.curDir[i])
 
-if (colorState.curRed < 0) {
-    colorState.dirRed = 1;
-    colorState.curRed = 0;
-}
-if (colorState.curBlue < 0) {
-    colorState.dirBlue = 1;
-    colorState.curBlue = 0;
-}
-if (colorState.curGreen < 0) {
-    colorState.dirGreen = 1;
-    colorState.curGreen = 0;
-}
+        // Cap at max
+        if (colorState.curColor[i] > colorState.maxVal) {
+            colorState.curDir[i] = -1;
+            colorState.curColor[i] = colorState.maxVal - (i + 1);
+        }
+
+        // Cap at min
+        if (colorState.curColor[i] < 0) {
+            colorState.curDir[i] = 1;
+            colorState.curColor[i] = (i + 1);
+        }
+    }
 }
 
 // Redraw method
 function redraw() {
 // Calculate the main color
-var currentHue = "#" + ((colorState.curBlue & 0x0000FF) |
-                        ((colorState.curGreen << 8) & 0x00FF00) |
-                        ((colorState.curRed << 16) & 0xFF0000)).toString(16)
+var currentHue = "#" + ((colorState.curColor[2] & 0x0000FF) |
+                        ((colorState.curColor[1] << 8) & 0x00FF00) |
+                        ((colorState.curColor[0] << 16) & 0xFF0000)).toString(16)
 
 // Draw next frame
 context.strokeStyle = currentHue;
