@@ -16,7 +16,7 @@
     </style>
 
     <script src="relaxinghues.js"></script>
-    <script src="../common.js"></script>
+    <script src="../js/coddledcommon.js"></script>
 
 </head>
 
@@ -31,15 +31,7 @@ var htmlCanvas = document.getElementById('c');
 var context = htmlCanvas.getContext('2d');
 
 // State of colors
-var colorState = {
-    curRed: 0x00,
-    curBlue: 0x33,
-    curGreen: 0x11,
-    dirRed: 1,
-    dirBlue: 1,
-    dirGreen: 1,
-    maxVal: 0xFF
-};
+var colorState = createAppState();
 
 // Start the canvas (register listeners, startup timer, etc)
 startCanvas();

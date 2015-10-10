@@ -4,6 +4,19 @@
 // Oct 8, 2015
 //
 
+function createAppState() {
+    var colorState = {
+        curRed: 0x00,
+        curBlue: 0x33,
+        curGreen: 0x11,
+        dirRed: 1,
+        dirBlue: 1,
+        dirGreen: 1,
+        maxVal: 0xFF,
+    };
+
+    return colorState;
+}
 
 function updateColorState() {
 
