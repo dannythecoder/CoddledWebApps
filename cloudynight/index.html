@@ -13,7 +13,7 @@ overflow: hidden; /*  Disable scrollbars */
 display: block;  /* No floating content on sides */
 }
 </style>
-<script src="../js/coddledcommon.js"></script>
+<script src="cloudynight.js"></script>
 </head>
 
 <body>
@@ -22,29 +22,7 @@ display: block;  /* No floating content on sides */
 
 <script>
 // Context for drawing
-var htmlCanvas = document.getElementById('c');
-var context = htmlCanvas.getContext('2d');
-var currentHue = "#4444FF"
-
-// Redraw method
-function redraw() {
-// Draw next frame
-context.strokeStyle = currentHue;
-context.lineWidth = '10';
-context.strokeRect(0, 0, window.innerWidth, window.innerHeight);
-}
-
-// Key Down handler
-function doKeyDown(e) {
-  if(e.keyCode==37){
-    // Left Arrow
-    currentHue = "#FF4444";
-  }
-  else if(e.keyCode==39){
-    // Right Arrow
-    currentHue = "#44FF44";
-  }
-}
+var appState = createAppState();
 
 // Add a handler to resize when necessary
 startCanvas();
