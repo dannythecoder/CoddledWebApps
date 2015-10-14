@@ -9,38 +9,100 @@
  */
 
 /**
- * This method creates the application context that all other methods
+ * This function creates the namespace for all components of
+ * cloudy night.
+ */
+function startCloudyNight() {
+
+// Create App State
+appState = createAppState();
+
+// Configure listeners
+initialize();
+
+
+
+///////////////////////////////////////////////
+//
+// State-control methods
+//
+///////////////////////////////////////////////
+
+/**
+ * Create the application context that all other methods
  * will use.  The result should be stored in a global called 'appState'
  */
 function createAppState() {
     var htmlCanvas = document.getElementById('c')
     var moonImage = new Image();
     moonImage.src = 'Moon512x512.png';
+    var cloudImage = new Image();
+    cloudImage.src = 'Cloud128x128.png';
 
     var appState = {
-        moonLocation: [15, 20],
-        cloudLocations: [1, 4, 8],
+        // Window states
         canvas: htmlCanvas,
         context: htmlCanvas.getContext('2d'),
         windowWidth: 100,
         windowHeight: 100,
         bg: '#001122',
+        lastUpdateTime: Date.now(), // Used for deltaTime calculation
+
+        // Moon state
+        moonLocation: [15, 20],
         moon: moonImage,
         moonSize: 100,
-        moonSpeed: 0.05
+        moonSpeed: 0.0017, // Pixels per millisecond
+
+        // Cloud states
+        cloudImage: cloudImage,
+        cloudLocations: [1, 50, 120]
     };
 
     return appState;
 }
 
+
+///////////////////////////////////////////////
+//
+// State-control methods
+//
+///////////////////////////////////////////////
+
 function updateLocations() {
+    // Calculate deltaTime
+    currTime = Date.now();
+    deltaTime = currTime - appState.lastUpdateTime;
+    appState.lastUpdateTime = currTime;
+
     // Move the moon
-    appState.moonLocation[0] += appState.moonSpeed;
+    appState.moonLocation[0] += (appState.moonSpeed * deltaTime);
     if (appState.moonLocation[0] > appState.windowWidth) {
         appState.moonLocation[0] = -1*appState.moonSize;
     }
 
+    // Move the clouds
+
 }
+
+// Key Down handler
+function doKeyDown(e) {
+  if(e.keyCode==37){
+    // Left Arrow
+    appState.moonLocation[0] -= 5;
+  }
+  else if(e.keyCode==39){
+    // Right Arrow
+    appState.moonLocation[0] += 5;
+  }
+}
+
+///////////////////////////////////////////////
+//
+// Display methods
+//
+///////////////////////////////////////////////
+
 
 // Redraw method
 function redraw() {
@@ -60,35 +122,25 @@ function redraw() {
                                appState.moonSize,
                                appState.moonSize)
 
+    // Draw the clouds
+    count = appState.cloudLocations.length;
+    for (var i = 0; i < count; i++) {
+        appState.context.drawImage(appState.cloudImage,
+                                   appState.cloudLocations[i],
+                                   60,
+                                   appState.moonSize/3,
+                                   appState.moonSize/3)
+    }
+
     // Update state
     updateLocations();
 }
 
-// Key Down handler
-function doKeyDown(e) {
-  if(e.keyCode==37){
-    // Left Arrow
-    appState.moonLocation[0] -= 0.1;
-  }
-  else if(e.keyCode==39){
-    // Right Arrow
-    appState.moonLocation[0] += 0.1;
-  }
-}
-
-/**
- * Configure all the necessary handlers, setup initial state, etc.
- * Before calling this method, be sure that the following
- * functions are defined.
- *
- * redraw() - redraw the canvas content.
- * doKeyDown(e) - Handler for keydown events.
- *
- */
-function startCanvas() {
-
-// Configure listeners
-initialize();
+///////////////////////////////////////////////
+//
+// Setup/Teardown methods
+//
+///////////////////////////////////////////////
 
 function initialize() {
     // Register resize listener
@@ -128,4 +180,4 @@ function resizeCanvas() {
     redraw();
 }
 
-} // end startCanvas
+} // end startCloudyNight

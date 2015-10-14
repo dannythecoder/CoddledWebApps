@@ -16,17 +16,10 @@ display: block;  /* No floating content on sides */
 <script src="cloudynight.js"></script>
 </head>
 
-<body>
+<body onload="startCloudyNight();">
 <canvas id='c' style = 'position: absolute; left: 0px; top: 0px;' >
+    Where did you find a web browser that doesn't support canvas?
 </canvas>
-
-<script>
-// Context for drawing
-var appState = createAppState();
-
-// Add a handler to resize when necessary
-startCanvas();
-</script>
 
 </body>
 
