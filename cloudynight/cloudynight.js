@@ -31,6 +31,15 @@ initialize();
 /**
  * Create the application context that all other methods
  * will use.  The result should be stored in a global called 'appState'
+ *
+ * The moon occupies the top 1/4 of the screen.
+ *
+ * The horizon is about 2/3 down from the top of the screen. As clouds get 
+ * closer to the horizon, they get smaller in both the verification and 
+ * horizontal directions.
+ *
+ * The ground occupies the lower 1/3 of the screen.
+ *
  */
 function createAppState() {
     var htmlCanvas = document.getElementById('c')
