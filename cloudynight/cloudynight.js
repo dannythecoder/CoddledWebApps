@@ -47,6 +47,8 @@ function createAppState() {
     // Load Images
     var moonImage = new Image();
     moonImage.src = 'Moon512x512.png';
+    var groundImage = new Image();
+    groundImage.src = 'Ground512x512.png';
     var cloudImages = []
     cloudImages[0] = new Image();
     cloudImages[0].src = 'CloudA256x256.png';
@@ -57,19 +59,7 @@ function createAppState() {
     var cloudCount = 100;
 
     // Generate clouds
-    clouds = []
-    for (var i = 0; i < cloudCount; i++)
-    {
-        var cloud = {
-            x: 1,
-            y: 80,
-            speedScale: 0.8,
-            sizeScale: 1.0,
-            puffs: 8,
-            imageIndex: 0
-        }
-        clouds.push(cloud);
-    }
+    clouds = generateInitialClouds(cloudCount);
 
     // Create the appState structure
     var appState = {
@@ -93,10 +83,37 @@ function createAppState() {
         // Cloud states
         cloudImages: cloudImages,
         clouds: clouds,
-        cloudSize: 80
+        cloudSize: 80,
+
+        // Ground
+        groundImage: groundImage
     };
 
     return appState;
+}
+
+function generateInitialClouds(cloudCount) {
+    // Always produce at least 1 cloud
+    if (cloudCount < 1) {
+        cloudCount = 1;
+    }
+
+    // Generate the objects
+    clouds = []
+    for (var i = 0; i < cloudCount; i++)
+    {
+        var cloud = {
+            x: 1,
+            y: 80,
+            speedScale: 0.8,
+            sizeScale: 1.0,
+            puffs: 8,
+            imageIndex: 0
+        }
+        clouds.push(cloud);
+    }
+
+    return clouds;
 }
 
 function generateRandomCloud(cloud) {
@@ -159,6 +176,20 @@ function doKeyDown(e) {
     // Right Arrow
     appState.moonLocation[0] += 5;
   }
+  else if(e.keyCode==38){
+    // Up Arrow
+    // More clouds!
+    var curLen = appState.clouds.length;
+    appState.clouds = generateInitialClouds(curLen + 50);
+    resizeCanvas();
+  }
+  else if(e.keyCode==40){
+    // Down Arrow
+    // Fewer clouds!
+    var curLen = appState.clouds.length;
+    appState.clouds = generateInitialClouds(curLen - 50);
+    resizeCanvas();
+  }
 }
 
 ///////////////////////////////////////////////
@@ -179,12 +210,20 @@ function redraw() {
     appState.context.lineWidth = '10';
     appState.context.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
+    // Draw the ground
+    appState.context.drawImage(
+        appState.groundImage,
+        0,
+        (appState.windowHeight * 2 / 3) + (appState.cloudSize/3),
+        appState.windowWidth,
+        appState.windowHeight / 3);
+
     // Draw the moon
     appState.context.drawImage(appState.moon,
                                appState.moonLocation[0],
                                appState.moonLocation[1],
                                appState.moonSize,
-                               appState.moonSize)
+                               appState.moonSize);
 
     // Draw the clouds
     var cloudScale = (appState.windowHeight * 2.0 / 3.0);
