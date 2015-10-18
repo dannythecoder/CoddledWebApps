@@ -47,7 +47,7 @@ function createAppState() {
     moonImage.src = 'Moon512x512.png';
     var cloudImage = new Image();
     cloudImage.src = 'Cloud128x128.png';
-    var cloudCount = 10;
+    var cloudCount = 100;
 
     // Generate clouds
     clouds = []
@@ -73,7 +73,7 @@ function createAppState() {
         lastUpdateTime: Date.now(), // Used for deltaTime calculation
 
         // World state
-        windSpeed: 0.02,
+        windSpeed: -0.005,
 
         // Moon state
         moonLocation: [15, 20],
@@ -87,6 +87,16 @@ function createAppState() {
     };
 
     return appState;
+}
+
+function generateRandomCloud(cloud) {
+    var cloudMinY = 10;
+    var cloudMaxY = appState.windowHeight * 2.0 / 3.0;
+    var cloudMinX = 0;
+    var cloudMaxX = appState.windowWidth;
+    cloud.y = Math.random() * (cloudMaxY - cloudMinY) + cloudMinY;
+    cloud.speedScale = Math.random() * (1.0 - 0.3) + 0.3;
+    cloud.x = Math.random() * (cloudMaxX - cloudMinX) + cloudMinX;
 }
 
 
@@ -111,6 +121,12 @@ function updateLocations() {
     // Move the clouds
     appState.clouds.forEach(function (item, index, array) {
         item.x += (item.speedScale * appState.windSpeed * deltaTime);
+        if (item.x > (appState.windowWidth + 20)) {
+            item.x = -20;
+        }
+        if (item.x < -20) {
+            item.x = appState.windowWidth + 20;
+        }
     });
 }
 
@@ -152,14 +168,14 @@ function redraw() {
                                appState.moonSize)
 
     // Draw the clouds
-    var cloudScale = (appState.windowHeight * 2.0 / 3.0) * 15;
+    var cloudScale = (appState.windowHeight * 2.0 / 3.0);
     var count = appState.clouds.length;
     for (var i = 0; i < count; i++) {
         appState.context.drawImage(appState.cloudImage,
                                    appState.clouds[i].x,
                                    appState.clouds[i].y,
-                                   cloudScale / appState.clouds[i].y,
-                                   cloudScale / appState.clouds[i].y);
+                                   ((1 - appState.clouds[i].y / cloudScale) + 0.5) * 20,
+                                   ((1 - appState.clouds[i].y / cloudScale) + 0.5) * 20);
     }
 
     // Update state
@@ -183,7 +199,9 @@ function initialize() {
     window.addEventListener('keydown',doKeyDown,false);
 
     // Setup a 30fps timer to redraw
-    timer = setInterval(redraw, 33);
+    // 33 = 30 fps
+    // 66 = 15 fps
+    timer = setInterval(redraw, 66);
 }
 
 // Provide a default redraw() method that a caller-supplied redraw() could
@@ -206,11 +224,9 @@ function resizeCanvas() {
     appState.moonSize = Math.min(appState.windowHeight,
                                  appState.windowWidth) / 3.0;
 
-    // Recalculate cloud vertical positions.
-    var cloudMin = 10;
-    var cloudMax = appState.windowHeight * 2.0 / 3.0;
+    // Recalculate cloud positions.
     appState.clouds.forEach(function (item, index, array) {
-        item.y = Math.random() * (cloudMax - cloudMin) + cloudMin;
+        generateRandomCloud(item);
     });
 
     // Redraw
