@@ -119,8 +119,8 @@ function generateInitialClouds(cloudCount) {
 function generateRandomCloud(cloud) {
     var cloudMinY = 10;
     var cloudMaxY = appState.windowHeight * 2.0 / 3.0;
-    var cloudMinX = 0;
-    var cloudMaxX = appState.windowWidth;
+    var cloudMinX = -1 * (appState.cloudSize*2);
+    var cloudMaxX = appState.windowWidth + (appState.cloudSize*2);
     var imageCount = appState.cloudImages.length;
 
     // Randomize location
@@ -176,15 +176,15 @@ function doKeyDown(e) {
     // Right Arrow
     appState.moonLocation[0] += 5;
   }
-  else if(e.keyCode==38){
-    // Up Arrow
+  else if(e.keyCode==38 || e.keyCode==81){
+    // Up Arrow or 'q'
     // More clouds!
     var curLen = appState.clouds.length;
     appState.clouds = generateInitialClouds(curLen + 50);
     resizeCanvas();
   }
-  else if(e.keyCode==40){
-    // Down Arrow
+  else if(e.keyCode==40 || e.keyCode==65){
+    // Down Arrow or 'a'
     // Fewer clouds!
     var curLen = appState.clouds.length;
     appState.clouds = generateInitialClouds(curLen - 50);
