@@ -56,7 +56,7 @@ function createAppState() {
     cloudImages[1].src = 'CloudC256x256.png';
 
     // Specify the number of clouds
-    var cloudCount = 100;
+    var cloudCount = 150;
 
     // Generate clouds
     clouds = generateInitialClouds(cloudCount);
@@ -119,8 +119,8 @@ function generateInitialClouds(cloudCount) {
 function generateRandomCloud(cloud) {
     var cloudMinY = 10;
     var cloudMaxY = appState.windowHeight * 2.0 / 3.0;
-    var cloudMinX = -1 * (appState.cloudSize*2);
-    var cloudMaxX = appState.windowWidth + (appState.cloudSize*2);
+    var cloudMinX = -1 * (appState.cloudSize*1.2);
+    var cloudMaxX = appState.windowWidth + (appState.cloudSize);
     var imageCount = appState.cloudImages.length;
 
     // Randomize location
@@ -146,6 +146,10 @@ function updateLocations() {
     // Calculate deltaTime
     currTime = Date.now();
     deltaTime = currTime - appState.lastUpdateTime;
+    if (deltaTime > 1000) {
+        // Limit time jumps to 1-second
+        deltaTime = 1000;
+    }
     appState.lastUpdateTime = currTime;
 
     // Move the moon
@@ -157,11 +161,13 @@ function updateLocations() {
     // Move the clouds
     appState.clouds.forEach(function (item, index, array) {
         item.x += (item.speedScale * appState.windSpeed * deltaTime);
-        if (item.x > (appState.windowWidth + (appState.cloudSize*2))) {
-            item.x = -1 * (appState.cloudSize*2);
+        if (item.x > (appState.windowWidth + (appState.cloudSize))) {
+            generateRandomCloud(item);
+            item.x = -1 * (appState.cloudSize+1.2);
         }
-        if (item.x < -1 * (appState.cloudSize*2)) {
-            item.x = appState.windowWidth + (appState.cloudSize*2);
+        if (item.x < -1 * (appState.cloudSize*1.2)) {
+            generateRandomCloud(item);
+            item.x = appState.windowWidth + (appState.cloudSize);
         }
     });
 }
@@ -189,6 +195,10 @@ function doKeyDown(e) {
     var curLen = appState.clouds.length;
     appState.clouds = generateInitialClouds(curLen - 50);
     resizeCanvas();
+  }
+  else if(e.keyCode==66){
+    // 'b'
+    appState.moonLocation[0] += 20;
   }
 }
 
