@@ -16,3 +16,7 @@ the MIT license.
 
 - http://threejs.org/license
 
+Controls
+--------
+
+For interactive web apps, press 'h' on a keyboard or touch the top left corner of the screen to show/hide a list of controls.
