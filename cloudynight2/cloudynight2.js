@@ -242,6 +242,10 @@ function redraw() {
 ///////////////////////////////////////////////
 
 function initialize() {
+
+    // some platforms have initial scroll issues
+    window.scrollTo(0,1);
+
     // Register resize listener
     window.addEventListener('resize', resizeCanvas, false);
 
