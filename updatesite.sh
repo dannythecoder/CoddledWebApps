@@ -16,4 +16,5 @@ fi
 cp -r js $1/
 cp -r relaxinghues $1/
 cp -r cloudynight $1/
+cp -r notetaker $1/
 
