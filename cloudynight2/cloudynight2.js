@@ -45,12 +45,10 @@ function createAppState() {
     moonImage.src = 'Moon512x512.png';
     var cloudImages = []
     cloudImages[0] = new Image();
-    cloudImages[0].src = 'CloudA256x256.png';
-    cloudImages[1] = new Image();
-    cloudImages[1].src = 'CloudC256x256.png';
+    cloudImages[0].src = 'CloudFaded.png';
 
     // Specify the number of clouds
-    var cloudCount = 150;
+    var cloudCount = 500;
 
     // Generate clouds
     clouds = generateInitialClouds(cloudCount);
@@ -62,7 +60,7 @@ function createAppState() {
         context: htmlCanvas.getContext('2d'),
         windowWidth: 100,
         windowHeight: 100,
-        bg: '#001122',
+        bg: '#000009',
         lastUpdateTime: Date.now(), // Used for deltaTime calculation
 
         // World state
@@ -220,15 +218,17 @@ function redraw() {
                                appState.moonSize);
 
     // Draw the clouds
-    var cloudScale = (appState.windowHeight);
+    var cloudScale = appState.windowHeight;
     var count = appState.clouds.length;
     for (var i = 0; i < count; i++) {
         appState.context.drawImage(
             appState.cloudImages[appState.clouds[i].imageIndex],
             appState.clouds[i].x,
             appState.clouds[i].y,
-            ((1 - appState.clouds[i].y / cloudScale) + 0.5) * appState.cloudSize,
-            ((1 - appState.clouds[i].y / cloudScale) + 0.5) * appState.cloudSize);
+            appState.cloudSize,
+            appState.cloudSize);
+
+            //((1 - appState.clouds[i].y / cloudScale) + 0.5) * appState.cloudSize);
     }
 
     // Update state
@@ -259,14 +259,10 @@ function initialize() {
     // 33 = 30 fps
     // 66 = 15 fps
     timer = setInterval(redraw, 66);
-}
 
-// Provide a default redraw() method that a caller-supplied redraw() could
-// call.
-function redrawDefault() {
-    appState.context.strokeStyle = 'blue';
-    appState.context.lineWidth = '5';
-    appState.context.strokeRect(0, 0, window.innerWidth, window.innerHeight);
+    // Configure compositing
+    //appState.context.globalCompositeOperation = 'saturation';
+    appState.context.globalCompositeOperation = 'luminosity';
 }
 
 // Handler for resize events
@@ -281,9 +277,12 @@ function resizeCanvas() {
     appState.moonSize = Math.min(appState.windowHeight,
                                  appState.windowWidth) / 3.0;
 
+    // Recalculate moon Y coordinate
+    appState.moonLocation[1] = (appState.windowHeight / 2.0) - (appState.moonSize / 2.0);
+
     // Recalculate cloud size
     appState.cloudSize = Math.min(appState.windowHeight,
-                                  appState.windowWidth) / 6.0;
+                                  appState.windowWidth) / 10.0;
 
     // Recalculate cloud positions.
     appState.clouds.forEach(function (item, index, array) {
