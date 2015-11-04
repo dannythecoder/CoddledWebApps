@@ -134,12 +134,16 @@ function updateLocations() {
 
     // Move the stars
     appState.stars.forEach(function (item, index, array) {
-        item.x += (appState.starSpeed * deltaTime);
+        // Move this star
+        //item.x += (appState.starSpeed * deltaTime);
+        item.x += (appState.starSpeed * item.sizeScale * deltaTime);
+
+        // Wrap around
         if (item.x > (appState.windowWidth + (appState.starSize))) {
             generateRandomStar(item);
-            item.x = -1 * (appState.starSize+1.2);
+            item.x = -1 * (appState.starSize * 1.2);
         }
-        if (item.x < -1 * (appState.starSize*1.2)) {
+        if (item.x < -1 * (appState.starSize * 1.2)) {
             generateRandomStar(item);
             item.x = appState.windowWidth + (appState.starSize);
         }
@@ -188,6 +192,8 @@ function doTouchStart(e) {
         touchY = e.targetTouches[i].pageY;
 
         // TODO Queue a shooting star, beginning at this location.
+        appState.stars[i].x = touchX;
+        appState.stars[i].y = touchY;
     }
 }
 

@@ -163,9 +163,9 @@ function updateLocations() {
         item.x += (item.speedScale * appState.windSpeed * deltaTime);
         if (item.x > (appState.windowWidth + (appState.cloudSize))) {
             generateRandomCloud(item);
-            item.x = -1 * (appState.cloudSize+1.2);
+            item.x = -1 * (appState.cloudSize * 1.2);
         }
-        if (item.x < -1 * (appState.cloudSize*1.2)) {
+        if (item.x < -1 * (appState.cloudSize * 1.2)) {
             generateRandomCloud(item);
             item.x = appState.windowWidth + (appState.cloudSize);
         }
