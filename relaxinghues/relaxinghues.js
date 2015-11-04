@@ -40,30 +40,30 @@ function updateColorState() {
 
 // Redraw method
 function redraw() {
-// Calculate the main color
-var currentHue = "#" + ((Math.round(colorState.curColor[2]) & 0x0000FF) |
-                        ((Math.round(colorState.curColor[1]) << 8) & 0x00FF00) |
-                        ((Math.round(colorState.curColor[0]) << 16) &
-                          0xFF0000)).toString(16)
+    // Calculate the main color
+    var currentHue = "#" + ((Math.round(colorState.curColor[2]) & 0x0000FF) |
+                            ((Math.round(colorState.curColor[1]) << 8) & 0x00FF00) |
+                            ((Math.round(colorState.curColor[0]) << 16) &
+                              0xFF0000)).toString(16)
 
-// Draw next frame
-context.strokeStyle = currentHue;
-context.fillStyle = currentHue;
-context.lineWidth = '10';
-context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    // Draw next frame
+    context.strokeStyle = currentHue;
+    context.fillStyle = currentHue;
+    context.lineWidth = '10';
+    context.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-// Update state
-updateColorState();
+    // Update state
+    updateColorState();
 }
 
 // Key Down handler
 function doKeyDown(e) {
-  if(e.keyCode==37){
-    // Left Arrow
-    colorState.curRed = 0;
-  }
-  else if(e.keyCode==39){
-    // Right Arrow
-    colorState.curBlue = 0;
-  }
+    if(e.keyCode==37){
+        // Left Arrow
+        colorState.curRed = 0;
+    }
+    else if(e.keyCode==39){
+        // Right Arrow
+        colorState.curBlue = 0;
+    }
 }

@@ -164,32 +164,32 @@ function updateLocations() {
 
 // Key Down handler
 function doKeyDown(e) {
-  if(e.keyCode==37){
-    // Left Arrow
-    appState.moonLocation[0] -= 5;
-  }
-  else if(e.keyCode==39){
-    // Right Arrow
-    appState.moonLocation[0] += 5;
-  }
-  else if(e.keyCode==38 || e.keyCode==81){
-    // Up Arrow or 'q'
-    // More clouds!
-    var curLen = appState.clouds.length;
-    appState.clouds = generateInitialClouds(curLen + 50);
-    resizeCanvas();
-  }
-  else if(e.keyCode==40 || e.keyCode==65){
-    // Down Arrow or 'a'
-    // Fewer clouds!
-    var curLen = appState.clouds.length;
-    appState.clouds = generateInitialClouds(curLen - 50);
-    resizeCanvas();
-  }
-  else if(e.keyCode==66){
-    // 'b'
-    appState.moonLocation[0] += 20;
-  }
+    if(e.keyCode==37){
+        // Left Arrow
+        appState.moonLocation[0] -= 5;
+    }
+    else if(e.keyCode==39){
+        // Right Arrow
+        appState.moonLocation[0] += 5;
+    }
+    else if(e.keyCode==38 || e.keyCode==81){
+        // Up Arrow or 'q'
+        // More clouds!
+        var curLen = appState.clouds.length;
+        appState.clouds = generateInitialClouds(curLen + 50);
+        resizeCanvas();
+    }
+    else if(e.keyCode==40 || e.keyCode==65){
+        // Down Arrow or 'a'
+        // Fewer clouds!
+        var curLen = appState.clouds.length;
+        appState.clouds = generateInitialClouds(curLen - 50);
+        resizeCanvas();
+    }
+    else if(e.keyCode==66){
+        // 'b'
+        appState.moonLocation[0] += 20;
+    }
 }
 
 ///////////////////////////////////////////////
