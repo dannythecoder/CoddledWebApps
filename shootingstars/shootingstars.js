@@ -69,6 +69,10 @@ function createAppState() {
         stars: stars,
         starSize: 2.2,
 
+        // Shooting star states
+        shootingStars: [],
+        shootingStarSpeed: 0.05 // Pixels per millisecond
+
     };
 
     return appState;
@@ -115,6 +119,21 @@ function generateRandomStar(star) {
     star.sizeScale = Math.random() * (1.0 - 0.2) + 0.2;
 }
 
+function addShootingStar(startX, startY) {
+
+    // Generate the object
+    var shootingStar = {
+        x: startX,
+        y: startY,
+        sizeScale: Math.random() * (1.0 - 0.3) + 0.3,
+        direction: Math.random() * 2 * Math.PI, // Radians
+        imageIndex: 0,
+        progress: 0 // Ranges from 0 to 100
+    }
+
+    appState.shootingStars.push(shootingStar);
+}
+
 
 ///////////////////////////////////////////////
 //
@@ -148,18 +167,43 @@ function updateLocations() {
             item.x = appState.windowWidth + (appState.starSize);
         }
     });
+
+    // Move the shooting stars
+    appState.shootingStars.forEach(function (item, index, array) {
+        // Move this shooting star
+        item.x += (appState.shootingStarSpeed * item.sizeScale * deltaTime * Math.cos(item.direction));
+        item.y += (appState.shootingStarSpeed * item.sizeScale * deltaTime * Math.sin(item.direction));
+        item.progress += 1
+
+        // No Wrap around for shooting stars, just disappear when finished
+        if (item.x > (appState.windowWidth + (appState.starSize))) {
+            item.progress = 100;
+        }
+        if (item.x < -1 * (appState.starSize * 1.2)) {
+            item.progress = 100;
+        }
+    });
+
+    // Remove stars with progress >= 100
+    for (var i = 0; i < appState.shootingStars.length; i++) {
+        if (appState.shootingStars[i].progress >= 100) {
+            appState.shootingStars.splice(i, 1);
+        }
+    }
+
 }
 
 // Key Down handler
 function doKeyDown(e) {
     if(e.keyCode==37){
         // Left Arrow
-        // TODO Start a shooting star on the left.
-
+        // Start a shooting star on the left.
+        addShootingStar(appState.windowWidth/4, appState.windowHeight/2);
     }
     else if(e.keyCode==39){
         // Right Arrow
-        // TODO Start a shooting star on the right.
+        // Start a shooting star on the right.
+        addShootingStar(appState.windowWidth * 3/4, appState.windowHeight/2);
     }
     else if(e.keyCode==38 || e.keyCode==81){
         // Up Arrow or 'q'
@@ -177,7 +221,10 @@ function doKeyDown(e) {
     }
     else if(e.keyCode==66){
         // 'b'
-        // TODO Start a random shooting star.
+        // Start a random shooting star.
+        startY = Math.random() * appState.windowHeight;
+        startX = Math.random() * appState.windowWidth;
+        addShootingStar(startX, startY);
     }
 }
 
@@ -191,10 +238,23 @@ function doTouchStart(e) {
         touchX = e.targetTouches[i].pageX;
         touchY = e.targetTouches[i].pageY;
 
-        // TODO Queue a shooting star, beginning at this location.
-        appState.stars[i].x = touchX;
-        appState.stars[i].y = touchY;
+        // Queue a shooting star, beginning at this location.
+        addShootingStar(touchX, touchY);
+//        appState.stars[i].x = touchX;
+//        appState.stars[i].y = touchY;
     }
+}
+
+// Mouse handler
+function doMouseDown(e) {
+
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    // Queue a shooting star, beginning at this location.
+    addShootingStar(mouseX, mouseY);
+//    appState.stars[0].x = mouseX;
+//    appState.stars[0].y = mouseY;
 }
 
 ///////////////////////////////////////////////
@@ -225,7 +285,17 @@ function redraw() {
             appState.stars[i].y,
             appState.starSize * appState.stars[i].sizeScale,
             appState.starSize * appState.stars[i].sizeScale);
-            //((1 - appState.stars[i].y / starScale) + 0.5) * appState.starSize);
+    }
+
+    // Draw the shooting stars
+    var count = appState.shootingStars.length;
+    for (var i = 0; i < count; i++) {
+        appState.context.drawImage(
+            appState.starImages[appState.shootingStars[i].imageIndex],
+            appState.shootingStars[i].x,
+            appState.shootingStars[i].y,
+            appState.starSize * appState.shootingStars[i].sizeScale,
+            appState.starSize * appState.shootingStars[i].sizeScale);
     }
 
     // Update state
@@ -254,6 +324,9 @@ function initialize() {
 
     // Register a touch listener
     document.getElementById('c').addEventListener('touchstart', doTouchStart, false);
+
+    // Register a mouse listener
+    document.getElementById('c').addEventListener('mousedown', doMouseDown, false);
 
     // Setup a 30fps timer to redraw
     // 33 = 30 fps
