@@ -9,29 +9,28 @@
  */
 
 /**
- * This function creates the namespace for all components of
- * Shooting Stars.
+ * Create the namespace for all components of Shooting Stars.
  */
 function startShootingStars() {
 
-// Create App State
+// Create App State within this namespace
 appState = createAppState();
 
-// Configure listeners
+// Configure listeners and start the world
 initialize();
 
 
-
-///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 //
-// State-control methods
+// Object Creation
 //
-///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Create the application context that all other methods
  * will use.  The result should be stored in a global called 'appState'
- *
  */
 function createAppState() {
     var htmlCanvas = document.getElementById('c')
@@ -40,10 +39,6 @@ function createAppState() {
     var starImages = []
     starImages[0] = new Image();
     starImages[0].src = 'Star1.png';
-//    starImages[1] = new Image();
-//    starImages[1].src = 'Star2.png';
-//    starImages[1] = new Image();
-//    starImages[1].src = 'ShootingStar1.png';
 
     // Specify the number of stars
     var starCount = 350;
@@ -78,6 +73,10 @@ function createAppState() {
     return appState;
 }
 
+/**
+ * Create the initial stars for the cosmos.
+ * @param {number} starCount The number of stars to produce.
+ */
 function generateInitialStars(starCount) {
     // Always produce at least 1 star
     if (starCount < 1) {
@@ -101,6 +100,10 @@ function generateInitialStars(starCount) {
     return stars;
 }
 
+/**
+ * Populate a single star's data structure with random values.
+ * @param star A star object to be randomized.
+ */
 function generateRandomStar(star) {
     var starMinY = -1 * (appState.starSize*1.2);
     var starMaxY = appState.windowHeight + appState.starSize;
@@ -119,6 +122,11 @@ function generateRandomStar(star) {
     star.sizeScale = Math.random() * (1.0 - 0.2) + 0.2;
 }
 
+/**
+ * Add a shooting star to the list of shooting stars.
+ * @param {number} startX The starting X coordinate (in canvas coordinates).
+ * @param {number} startY The starting Y coordinate (in canvas coordinates).
+ */
 function addShootingStar(startX, startY) {
 
     // Generate the object
@@ -135,12 +143,20 @@ function addShootingStar(startX, startY) {
 }
 
 
-///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 //
-// State-control methods
+// World Tracking
 //
-///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Update the locations of all the world objects.
+ * Note that the calculation is based on deltaTime, not frames, so even if
+ * the frame rate is inconsistent, the overall motion will be corrected
+ * based on the physics model.
+ */
 function updateLocations() {
     // Calculate deltaTime
     currTime = Date.now();
@@ -193,7 +209,19 @@ function updateLocations() {
 
 }
 
-// Key Down handler
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//
+// User Input
+//
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Handle Key down events.
+ * @param e The key event.
+ */
 function doKeyDown(e) {
     if(e.keyCode==37){
         // Left Arrow
@@ -228,7 +256,10 @@ function doKeyDown(e) {
     }
 }
 
-// Touch handler
+/**
+ * Handle Touch Start events.
+ * @param e The touch event.
+ */
 function doTouchStart(e) {
     e.preventDefault();
 
@@ -240,12 +271,13 @@ function doTouchStart(e) {
 
         // Queue a shooting star, beginning at this location.
         addShootingStar(touchX, touchY);
-//        appState.stars[i].x = touchX;
-//        appState.stars[i].y = touchY;
     }
 }
 
-// Mouse handler
+/**
+ * Handle Mouse Down events.
+ * @param e The mouse event.
+ */
 function doMouseDown(e) {
 
     mouseX = e.clientX;
@@ -253,18 +285,19 @@ function doMouseDown(e) {
 
     // Queue a shooting star, beginning at this location.
     addShootingStar(mouseX, mouseY);
-//    appState.stars[0].x = mouseX;
-//    appState.stars[0].y = mouseY;
 }
 
-///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 //
-// Display methods
+// Display
 //
-///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
-
-// Redraw method
+/**
+ * Redraw the scene.
+ */
 function redraw() {
 
     // Draw next frame
@@ -302,12 +335,17 @@ function redraw() {
     updateLocations();
 }
 
-///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 //
-// Setup/Teardown methods
+// Setup/Teardown
 //
-///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Perform the initial setup of the world and register handlers.
+ */
 function initialize() {
 
     // some platforms have initial scroll issues
@@ -334,15 +372,9 @@ function initialize() {
     timer = setInterval(redraw, 66);
 }
 
-// Provide a default redraw() method that a caller-supplied redraw() could
-// call.
-function redrawDefault() {
-    appState.context.strokeStyle = 'blue';
-    appState.context.lineWidth = '5';
-    appState.context.strokeRect(0, 0, window.innerWidth, window.innerHeight);
-}
-
-// Handler for resize events
+/**
+ * Handle resize events to adjust the canvas dimensions.
+ */
 function resizeCanvas() {
     // Recalculate canvas size
     appState.canvas.width = window.innerWidth;
