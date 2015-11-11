@@ -55,6 +55,8 @@ function createAppState() {
         windowHeight: 100,
         bg: '#000000',
         lastUpdateTime: Date.now(), // Used for deltaTime calculation
+        helpOverlayColor: '#CCEEFF',
+        helpDisplayed: false,
 
         // World state
         starSpeed: -0.002, // Pixels per millisecond
@@ -223,10 +225,30 @@ function updateLocations() {
  */
 function displayHelp() {
 
+    var leftMargin = 5;
+    var topMargin = 28;
+    var sectionStarts = [topMargin + 24,
+                         topMargin + 90];
+
+    // TODO calculate the optimal font size based on window dimensions
+
     // Configure the font
+    appState.context.strokeStyle = appState.helpOverlayColor;
+    appState.context.fillStyle = appState.helpOverlayColor;
+    appState.context.lineWidth = '2';
+    appState.context.font = "14px serif";
 
     // Draw the text
+    appState.context.fillText("Controls", leftMargin, topMargin);
 
+    appState.context.fillText("Keyboard", leftMargin, sectionStarts[0]);
+    appState.context.fillText("h - help", leftMargin, sectionStarts[0] + 14);
+    appState.context.fillText("b - random shooting star", leftMargin, sectionStarts[0] + 28);
+    appState.context.fillText("q/a - more/fewer stars", leftMargin, sectionStarts[0] + 42);
+
+    appState.context.fillText("Touch/Mouse", leftMargin, sectionStarts[1]);
+    appState.context.fillText("top left - help", leftMargin, sectionStarts[1] + 14);
+    appState.context.fillText("touch - new shooting star", leftMargin, sectionStarts[1] + 28);
 }
 
 /**
@@ -235,35 +257,34 @@ function displayHelp() {
  */
 function doKeyDown(e) {
     if(e.keyCode==37){
-        // Left Arrow
-        // Start a shooting star on the left.
+        // Left Arrow - shooting star from the left
         addShootingStar(appState.windowWidth/4, appState.windowHeight/2);
     }
     else if(e.keyCode==39){
-        // Right Arrow
-        // Start a shooting star on the right.
+        // Right Arrow - shooting star from the right
         addShootingStar(appState.windowWidth * 3/4, appState.windowHeight/2);
     }
     else if(e.keyCode==38 || e.keyCode==81){
-        // Up Arrow or 'q'
-        // More stars!
+        // Up Arrow or 'q' - more stars
         var curLen = appState.stars.length;
         appState.stars = generateInitialStars(curLen + 50);
         resizeCanvas();
     }
     else if(e.keyCode==40 || e.keyCode==65){
-        // Down Arrow or 'a'
-        // Fewer stars!
+        // Down Arrow or 'a' - fewer stars
         var curLen = appState.stars.length;
         appState.stars = generateInitialStars(curLen - 50);
         resizeCanvas();
     }
     else if(e.keyCode==66){
-        // 'b'
-        // Start a random shooting star.
+        // 'b' - random shooting star
         startY = Math.random() * appState.windowHeight;
         startX = Math.random() * appState.windowWidth;
         addShootingStar(startX, startY);
+    }
+    else if(e.keyCode==72){
+        // 'h' - help
+        appState.helpDisplayed = !appState.helpDisplayed;
     }
 }
 
@@ -280,8 +301,14 @@ function doTouchStart(e) {
         touchX = e.targetTouches[i].pageX;
         touchY = e.targetTouches[i].pageY;
 
-        // Queue a shooting star, beginning at this location.
-        addShootingStar(touchX, touchY);
+        // is this touch in a special region?
+        // top left - help
+        if ((touchX < appState.windowWidth / 8) && (touchY < appState.windowHeight / 8)) {
+            appState.helpDisplayed = !appState.helpDisplayed;
+        } else {
+            // Queue a shooting star, beginning at this location.
+            addShootingStar(touchX, touchY);
+        }
     }
 }
 
@@ -340,6 +367,11 @@ function redraw() {
             appState.shootingStars[i].y,
             appState.starSize * appState.shootingStars[i].sizeScale,
             appState.starSize * appState.shootingStars[i].sizeScale);
+    }
+
+    // Draw the help overlay
+    if (appState.helpDisplayed) {
+        displayHelp();
     }
 
     // Update state
