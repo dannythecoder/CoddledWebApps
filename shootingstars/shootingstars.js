@@ -219,6 +219,17 @@ function updateLocations() {
 //////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Display the help/controls overlay.
+ */
+function displayHelp() {
+
+    // Configure the font
+
+    // Draw the text
+
+}
+
+/**
  * Handle Key down events.
  * @param e The key event.
  */
