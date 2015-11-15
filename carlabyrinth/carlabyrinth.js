@@ -270,7 +270,7 @@ function clearAllTouches() {
 }
 
 /**
- * Handle Touch Start events.
+ * Handle Touch Start/End/Cancel/Move events.
  * @param e The touch event.
  */
 function doTouchStart(e) {
@@ -283,25 +283,6 @@ function doTouchStart(e) {
     {
         touchX = e.targetTouches[i].pageX;
         touchY = e.targetTouches[i].pageY;
-
-        processTouch(touchX, touchY);
-    }
-}
-
-/**
- * Handle Touch End events.
- * @param e The touch event.
- */
-function doTouchEnd(e) {
-    e.preventDefault();
-
-    clearAllTouches();
-
-    touchCount = e.touches.length;
-    for (var i = 0; i < touchCount; i++)
-    {
-        touchX = e.touches[i].pageX;
-        touchY = e.touches[i].pageY;
 
         processTouch(touchX, touchY);
     }
@@ -412,7 +393,9 @@ function initialize() {
 
     // Register a touch listener
     document.getElementById('c').addEventListener('touchstart', doTouchStart, false);
-    document.getElementById('c').addEventListener('touchend', doTouchEnd, false);
+    document.getElementById('c').addEventListener('touchend', doTouchStart, false);
+    document.getElementById('c').addEventListener('touchcancel', doTouchStart, false);
+    document.getElementById('c').addEventListener('touchmove', doTouchStart, false);
 
     // Register a mouse listener
     document.getElementById('c').addEventListener('mousedown', doMouseDown, false);
