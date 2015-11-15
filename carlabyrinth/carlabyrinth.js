@@ -65,7 +65,11 @@ function createAppState() {
         carSize: 2.2,
         carX: 0,
         carY: 10,
+
+        // Control variables
         turnScale: 0.1, // Radiens per button press/touch/mousedown
+        turningRight: false,
+        turningLeft: false,
 
         // Wall state
         walls: walls,
@@ -243,6 +247,38 @@ function doTouchStart(e) {
 }
 
 /**
+ * Handle Touch End events.
+ * @param e The touch event.
+ */
+function doTouchEnd(e) {
+    e.preventDefault();
+
+    touchCount = e.touches.length;
+    for (var i = 0; i < touchCount; i++)
+    {
+        touchX = e.touches[i].pageX;
+        touchY = e.touches[i].pageY;
+
+        // is this touch in a special region?
+        // top left - help
+        if ((touchX < appState.windowWidth / 8) && (touchY < appState.windowHeight / 8)) {
+            appState.helpDisplayed = !appState.helpDisplayed;
+        } else if (touchX < appState.windowWidth / 3) {
+            // Left Touch, turn left
+            appState.carDirection -= appState.turnScale;
+        } else if (touchX > appState.windowWidth * 2 / 3) {
+            // Right Touch, turn right
+            appState.carDirection += appState.turnScale;
+        } else if ((touchX > appState.windowWidth / 3) &&
+                   (touchX < appState.windowWidth * 2 / 3) &&
+                   (touchY < appState.windowHeight / 2) ) {
+            //Top Center touch, toggle sound
+            appState.soundEnabled = !appState.soundEnabled;
+        }
+    }
+}
+
+/**
  * Handle Mouse Down events.
  * @param e The mouse event.
  */
@@ -297,8 +333,6 @@ function redraw() {
     // Draw the car
     appState.context.drawImage(
         appState.carImage,
-//        appState.carX,
-//        appState.carY,
         -1 * appState.carSize / 2,
         -1 * appState.carSize / 2,
         appState.carSize,
@@ -354,7 +388,7 @@ function initialize() {
 
     // Register a touch listener
     document.getElementById('c').addEventListener('touchstart', doTouchStart, false);
-//    document.getElementById('c').addEventListener('touchend', doTouchEnd, false);
+document.getElementById('c').addEventListener('touchend', doTouchEnd, false);
 
     // Register a mouse listener
     document.getElementById('c').addEventListener('mousedown', doMouseDown, false);
