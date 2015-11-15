@@ -58,7 +58,8 @@ function createAppState() {
         soundEnabled: false,
 
         // Car states
-        carSpeed: 0.02, // Pixels per millisecond
+        carSpeed: 0.002, // Pixels per millisecond
+        maxCarSpeed: 0.02,
         carDirection: 0, // Radiens
         carImage: carImage,
         carSize: 2.2,
@@ -122,15 +123,15 @@ function updateLocations() {
     appState.lastUpdateTime = currTime;
 
     // Move the car
-    appState.carX += (appState.carSpeed * item.carSize* deltaTime * Math.cos(item.carDirection));
-    appState.carY += (appState.carSpeed * item.carSize * deltaTime * Math.sin(item.carDirection));
+    appState.carX += (appState.carSpeed * appState.carSize * deltaTime * Math.cos(appState.carDirection));
+    appState.carY += (appState.carSpeed * appState.carSize * deltaTime * Math.sin(appState.carDirection));
 
     // Wrap around the right and left side of the screen
-    if (appState.carX > (appState.windowWidth + (appState.carSize))) {
+    if (appState.carX > (appState.windowWidth + appState.carSize)) {
         appState.carX = -1 * appState.carSize;
     }
     if (appState.carX < -1 * (appState.carSize)) {
-        appState.carX = appState.carSize;
+        appState.carX = appState.windowWidth + appState.carSize;
     }
 
     // Wrap around the top and bottom of the screen
@@ -138,7 +139,7 @@ function updateLocations() {
         appState.carY = -1 * appState.carSize;
     }
     if (appState.carY < -1 * (appState.carSize)) {
-        appState.carY = appState.carSize;
+        appState.carY = appState.windowHeight;
     }
 
 }
@@ -160,7 +161,7 @@ function displayHelp() {
     var leftMargin = 5;
     var topMargin = 28;
     var sectionStarts = [topMargin + 24,
-                         topMargin + 90];
+                         topMargin + 104];
 
     // TODO calculate the optimal font size based on window dimensions
 
@@ -191,15 +192,15 @@ function displayHelp() {
  * @param e The key event.
  */
 function doKeyDown(e) {
-    if(e.keyCode==37 || e.keyCode==40){
+    if(e.keyCode==37 || e.keyCode==65){
         // Left Arrow or 'a' - turn left
         appState.carDirection -= appState.turnScale;
     }
-    else if(e.keyCode==39 || e.keyCode==43){
+    else if(e.keyCode==39 || e.keyCode==68){
         // Right Arrow or 'd' - turn right
         appState.carDirection += appState.turnScale;
     }
-    else if(e.keyCode==44){
+    else if(e.keyCode==69){
         // 'e' - toggle sound
         appState.soundEnabled = !appState.soundEnabled;
     }
@@ -289,13 +290,21 @@ function redraw() {
     appState.context.lineWidth = '10';
     appState.context.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
+    // Rotate for the car
+    // Translate for the car display
+    appState.context.translate(appState.carX, appState.carY);
+    appState.context.rotate(appState.carDirection + 1.5708);
     // Draw the car
     appState.context.drawImage(
         appState.carImage,
-        appState.carX,
-        appState.carY,
+//        appState.carX,
+//        appState.carY,
+        -1 * appState.carSize / 2,
+        -1 * appState.carSize / 2,
         appState.carSize,
         appState.carSize);
+    // Reset rotation
+    appState.context.setTransform(1, 0, 0, 1, 0, 0);
 
     /*
     // Draw the walls
@@ -345,6 +354,7 @@ function initialize() {
 
     // Register a touch listener
     document.getElementById('c').addEventListener('touchstart', doTouchStart, false);
+//    document.getElementById('c').addEventListener('touchend', doTouchEnd, false);
 
     // Register a mouse listener
     document.getElementById('c').addEventListener('mousedown', doMouseDown, false);
