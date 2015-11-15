@@ -67,7 +67,7 @@ function createAppState() {
         carY: 10,
 
         // Control variables
-        turnScale: 0.1, // Radiens per button press/touch/mousedown
+        turnScale: 0.2, // Radiens per button press/touch/mousedown
         turningRight: false,
         turningLeft: false,
 
@@ -126,26 +126,34 @@ function updateLocations() {
     }
     appState.lastUpdateTime = currTime;
 
+    // Handle car rotation if turning (this handles the case where someone
+    // is touching both sides, by canceling out the turns).
+    if (appState.turningLeft) {
+        appState.carDirection -= appState.turnScale;
+    }
+    if (appState.turningRight) {
+        appState.carDirection += appState.turnScale;
+    }
+
     // Move the car
     appState.carX += (appState.carSpeed * appState.carSize * deltaTime * Math.cos(appState.carDirection));
     appState.carY += (appState.carSpeed * appState.carSize * deltaTime * Math.sin(appState.carDirection));
 
     // Wrap around the right and left side of the screen
     if (appState.carX > (appState.windowWidth + appState.carSize)) {
-        appState.carX = -1 * appState.carSize;
+        appState.carX = -1 * appState.carSize * 0.5;
     }
     if (appState.carX < -1 * (appState.carSize)) {
-        appState.carX = appState.windowWidth + appState.carSize;
+        appState.carX = appState.windowWidth + appState.carSize * 0.5;
     }
 
     // Wrap around the top and bottom of the screen
     if (appState.carY > (appState.windowHeight + (appState.carSize))) {
-        appState.carY = -1 * appState.carSize;
+        appState.carY = -1 * appState.carSize * 0.5;
     }
     if (appState.carY < -1 * (appState.carSize)) {
         appState.carY = appState.windowHeight;
     }
-
 }
 
 
@@ -198,11 +206,11 @@ function displayHelp() {
 function doKeyDown(e) {
     if(e.keyCode==37 || e.keyCode==65){
         // Left Arrow or 'a' - turn left
-        appState.carDirection -= appState.turnScale;
+        appState.turningLeft = true;
     }
     else if(e.keyCode==39 || e.keyCode==68){
         // Right Arrow or 'd' - turn right
-        appState.carDirection += appState.turnScale;
+        appState.turningRight = true;
     }
     else if(e.keyCode==69){
         // 'e' - toggle sound
@@ -215,11 +223,60 @@ function doKeyDown(e) {
 }
 
 /**
+ * Handle Key up events.
+ * @param e The key event.
+ */
+function doKeyUp(e) {
+    if(e.keyCode==37 || e.keyCode==65){
+        // Left Arrow or 'a' - stop turn left
+        appState.turningLeft = false;
+    }
+    else if(e.keyCode==39 || e.keyCode==68){
+        // Right Arrow or 'd' - stop turn right
+        appState.turningRight = false;
+    }
+}
+
+/**
+ * Process a single touch/mouse event.
+ */
+function processTouch(touchX, touchY) {
+    // is this touch in a special region?
+
+    // top left - help
+    if ((touchX < appState.windowWidth / 8) && (touchY < appState.windowHeight / 8)) {
+        appState.helpDisplayed = !appState.helpDisplayed;
+    } else if (touchX < appState.windowWidth / 3) {
+        // Left Touch, turn left
+        appState.turningLeft = true;
+    } else if (touchX > appState.windowWidth * 2 / 3) {
+        // Right Touch, turn right
+        appState.turningRight = true;
+    } else if ((touchX > appState.windowWidth / 3) &&
+               (touchX < appState.windowWidth * 2 / 3) &&
+               (touchY < appState.windowHeight / 2) ) {
+        //Top Center touch, toggle sound
+        appState.soundEnabled = !appState.soundEnabled;
+    }
+}
+
+/**
+ * Clear all touch events, in preparation for processing more.
+ * This mostly just clears the state to reflect a condition where there are no active touches.
+ */
+function clearAllTouches() {
+    appState.turningLeft = false;
+    appState.turningRight = false;
+}
+
+/**
  * Handle Touch Start events.
  * @param e The touch event.
  */
 function doTouchStart(e) {
     e.preventDefault();
+
+    clearAllTouches();
 
     touchCount = e.targetTouches.length;
     for (var i = 0; i < touchCount; i++)
@@ -227,22 +284,7 @@ function doTouchStart(e) {
         touchX = e.targetTouches[i].pageX;
         touchY = e.targetTouches[i].pageY;
 
-        // is this touch in a special region?
-        // top left - help
-        if ((touchX < appState.windowWidth / 8) && (touchY < appState.windowHeight / 8)) {
-            appState.helpDisplayed = !appState.helpDisplayed;
-        } else if (touchX < appState.windowWidth / 3) {
-            // Left Touch, turn left
-            appState.carDirection -= appState.turnScale;
-        } else if (touchX > appState.windowWidth * 2 / 3) {
-            // Right Touch, turn right
-            appState.carDirection += appState.turnScale;
-        } else if ((touchX > appState.windowWidth / 3) &&
-                   (touchX < appState.windowWidth * 2 / 3) &&
-                   (touchY < appState.windowHeight / 2) ) {
-            //Top Center touch, toggle sound
-            appState.soundEnabled = !appState.soundEnabled;
-        }
+        processTouch(touchX, touchY);
     }
 }
 
@@ -253,28 +295,15 @@ function doTouchStart(e) {
 function doTouchEnd(e) {
     e.preventDefault();
 
+    clearAllTouches();
+
     touchCount = e.touches.length;
     for (var i = 0; i < touchCount; i++)
     {
         touchX = e.touches[i].pageX;
         touchY = e.touches[i].pageY;
 
-        // is this touch in a special region?
-        // top left - help
-        if ((touchX < appState.windowWidth / 8) && (touchY < appState.windowHeight / 8)) {
-            appState.helpDisplayed = !appState.helpDisplayed;
-        } else if (touchX < appState.windowWidth / 3) {
-            // Left Touch, turn left
-            appState.carDirection -= appState.turnScale;
-        } else if (touchX > appState.windowWidth * 2 / 3) {
-            // Right Touch, turn right
-            appState.carDirection += appState.turnScale;
-        } else if ((touchX > appState.windowWidth / 3) &&
-                   (touchX < appState.windowWidth * 2 / 3) &&
-                   (touchY < appState.windowHeight / 2) ) {
-            //Top Center touch, toggle sound
-            appState.soundEnabled = !appState.soundEnabled;
-        }
+        processTouch(touchX, touchY);
     }
 }
 
@@ -283,26 +312,20 @@ function doTouchEnd(e) {
  * @param e The mouse event.
  */
 function doMouseDown(e) {
+    clearAllTouches();
 
     mouseX = e.clientX;
     mouseY = e.clientY;
 
-    // is this mouse down in a special region?
-    // top left - help
-    if ((mouseX < appState.windowWidth / 8) && (mouseY < appState.windowHeight / 8)) {
-        appState.helpDisplayed = !appState.helpDisplayed;
-    } else if (mouseX < appState.windowWidth / 3) {
-        // Left Touch, turn left
-        appState.carDirection -= appState.turnScale;
-    } else if (mouseX > appState.windowWidth * 2 / 3) {
-        // Right Touch, turn right
-        appState.carDirection += appState.turnScale;
-    } else if ((mouseX > appState.windowWidth / 3) &&
-               (mouseX < appState.windowWidth * 2 / 3) &&
-               (mouseY < appState.windowHeight / 2) ) {
-        //Top Center touch, toggle sound
-        appState.soundEnabled = !appState.soundEnabled;
-    }
+    processTouch(mouseX, mouseY);
+}
+
+/**
+ * Handle Mouse Up events.
+ * @param e The mouse event.
+ */
+function doMouseUp(e) {
+    clearAllTouches();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -385,13 +408,15 @@ function initialize() {
 
     // Register a key listener
     window.addEventListener('keydown', doKeyDown, false);
+    window.addEventListener('keyup', doKeyUp, false);
 
     // Register a touch listener
     document.getElementById('c').addEventListener('touchstart', doTouchStart, false);
-document.getElementById('c').addEventListener('touchend', doTouchEnd, false);
+    document.getElementById('c').addEventListener('touchend', doTouchEnd, false);
 
     // Register a mouse listener
     document.getElementById('c').addEventListener('mousedown', doMouseDown, false);
+    document.getElementById('c').addEventListener('mouseup', doMouseUp, false);
 
     // Setup a 30fps timer to redraw
     // 33 = 30 fps
@@ -411,7 +436,7 @@ function resizeCanvas() {
 
     // Recalculate car size
     appState.carSize = Math.min(appState.windowHeight,
-                                  appState.windowWidth) / 20.0;
+                                  appState.windowWidth) / 15.0;
 
     // Recalculate wall positions.
     generateWalls();
