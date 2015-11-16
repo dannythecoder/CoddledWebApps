@@ -56,10 +56,13 @@ function createAppState() {
         helpOverlayColor: '#CCEEFF',
         helpDisplayed: false,
         soundEnabled: false,
+        debugText: "",
 
         // Car states
-        carSpeed: 0.002, // Pixels per millisecond
-        maxCarSpeed: 0.02,
+        carSpeed: 0.001, // Pixels per millisecond
+        carMaxSpeed: 0.006,
+        carMinSpeed: 0.0001,
+        carAcceleration: 0.000006,
         carDirection: 0, // Radiens
         carImage: carImage,
         carSize: 2.2,
@@ -67,7 +70,7 @@ function createAppState() {
         carY: 10,
 
         // Control variables
-        turnScale: 0.2, // Radiens per button press/touch/mousedown
+        turnScale: 0.004, // Radiens per millisecond
         turningRight: false,
         turningLeft: false,
 
@@ -128,11 +131,23 @@ function updateLocations() {
 
     // Handle car rotation if turning (this handles the case where someone
     // is touching both sides, by canceling out the turns).
+    // Turning also slows the car a bit.
     if (appState.turningLeft) {
-        appState.carDirection -= appState.turnScale;
+        appState.carDirection -= (appState.turnScale * deltaTime);
+        appState.carSpeed -= (appState.carAcceleration * 100);
     }
     if (appState.turningRight) {
-        appState.carDirection += appState.turnScale;
+        appState.carDirection += (appState.turnScale * deltaTime);
+        appState.carSpeed -= (appState.carAcceleration * 100);
+    }
+
+    // Adjust car speed
+    appState.carSpeed += (appState.carAcceleration * deltaTime);
+    if (appState.carSpeed > appState.carMaxSpeed) {
+        appState.carSpeed = appState.carMaxSpeed;
+    }
+    if (appState.carSpeed < appState.carMinSpeed) {
+        appState.carSpeed = appState.carMinSpeed;
     }
 
     // Move the car
@@ -154,6 +169,7 @@ function updateLocations() {
     if (appState.carY < -1 * (appState.carSize)) {
         appState.carY = appState.windowHeight;
     }
+
 }
 
 
@@ -173,7 +189,8 @@ function displayHelp() {
     var leftMargin = 5;
     var topMargin = 28;
     var sectionStarts = [topMargin + 24,
-                         topMargin + 104];
+                         topMargin + 104,
+                         topMargin + 184];
 
     // TODO calculate the optimal font size based on window dimensions
 
@@ -197,6 +214,10 @@ function displayHelp() {
     appState.context.fillText("touch left - turn left", leftMargin, sectionStarts[1] + 28);
     appState.context.fillText("touch right - turn right", leftMargin, sectionStarts[1] + 42);
     appState.context.fillText("touch top center - toggle sound", leftMargin, sectionStarts[1] + 56);
+
+    appState.context.fillText("Tips", leftMargin, sectionStarts[2]);
+    appState.context.fillText("Turn both directions simultaneously to break.", leftMargin, sectionStarts[2] + 14);
+    appState.context.fillText("Debug: " + appState.debugText, leftMargin, sectionStarts[2] + 28)
 }
 
 /**
@@ -206,11 +227,11 @@ function displayHelp() {
 function doKeyDown(e) {
     if(e.keyCode==37 || e.keyCode==65){
         // Left Arrow or 'a' - turn left
-        appState.turningLeft = true;
+        processTouch(appState.windowWidth / 6, appState.windowHeight / 2);
     }
     else if(e.keyCode==39 || e.keyCode==68){
         // Right Arrow or 'd' - turn right
-        appState.turningRight = true;
+        processTouch(appState.windowWidth * 5 / 6, appState.windowHeight / 2);
     }
     else if(e.keyCode==69){
         // 'e' - toggle sound
@@ -227,14 +248,8 @@ function doKeyDown(e) {
  * @param e The key event.
  */
 function doKeyUp(e) {
-    if(e.keyCode==37 || e.keyCode==65){
-        // Left Arrow or 'a' - stop turn left
-        appState.turningLeft = false;
-    }
-    else if(e.keyCode==39 || e.keyCode==68){
-        // Right Arrow or 'd' - stop turn right
-        appState.turningRight = false;
-    }
+    // Note: e.keyCode is not populated for keyup in Safari.
+    clearAllTouches();
 }
 
 /**
