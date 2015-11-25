@@ -218,7 +218,7 @@ function redraw() {
     appState.context.strokeStyle = appState.bg;
     appState.context.fillStyle = appState.bg;
     appState.context.lineWidth = '10';
-    appState.context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    appState.context.fillRect(0, 0, appState.windowWidth, appState.windowHeight);
 
     // Draw the ground
     appState.context.drawImage(
@@ -287,12 +287,26 @@ function redrawDefault() {
 
 // Handler for resize events
 function resizeCanvas() {
+	
+    // Determine if the dimensions are a lie
+    var backScale = backingScale(appState.context);
+    
     // Recalculate canvas size
-    appState.canvas.width = window.innerWidth;
-    appState.canvas.height = window.innerHeight;
-    appState.windowHeight = window.innerHeight;
+    appState.windowHeight = window.innerHeight * backScale;
+    appState.windowWidth = window.innerWidth * backScale;
+     
+   appState.canvas.width = appState.windowWidth;
+    appState.canvas.height = appState.windowHeight;
+ /*    
+   appState.canvas.width = window.innerWidth;
+    appState.canvas.height = window.innerHeight; */
+     
+ /*    appState.windowHeight = window.innerHeight;
     appState.windowWidth = window.innerWidth;
 
+    appState.canvas.width = appState.windowWidth * backScale;
+    appState.canvas.height = appState.windowHeight * backScale; */
+    
     // Recalculate moon size
     appState.moonSize = Math.min(appState.windowHeight,
                                  appState.windowWidth) / 3.0;
@@ -308,6 +322,15 @@ function resizeCanvas() {
 
     // Redraw
     redraw();
+}
+
+function backingScale(context) {
+    if ('devicePixelRatio' in window) {
+        if (window.devicePixelRatio > 1) {
+            return window.devicePixelRatio;
+        }
+    }
+    return 1;
 }
 
 } // end startCloudyNight
