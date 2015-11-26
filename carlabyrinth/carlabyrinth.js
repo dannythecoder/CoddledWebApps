@@ -56,6 +56,7 @@ function createAppState() {
         helpOverlayColor: '#CCEEFF',
         helpDisplayed: false,
         soundEnabled: false,
+        bgEnabled: true,
         debugText: "",
 
         // Car states
@@ -190,7 +191,7 @@ function displayHelp() {
     var topMargin = 28;
     var sectionStarts = [topMargin + 24,
                          topMargin + 104,
-                         topMargin + 184];
+                         topMargin + 198];
 
     // TODO calculate the optimal font size based on window dimensions
 
@@ -214,9 +215,10 @@ function displayHelp() {
     appState.context.fillText("touch left - turn left", leftMargin, sectionStarts[1] + 28);
     appState.context.fillText("touch right - turn right", leftMargin, sectionStarts[1] + 42);
     appState.context.fillText("touch top center - toggle sound", leftMargin, sectionStarts[1] + 56);
+    appState.context.fillText("touch bottom center - toggle background", leftMargin, sectionStarts[1] + 70);
 
     appState.context.fillText("Tips", leftMargin, sectionStarts[2]);
-    appState.context.fillText("Turn both directions simultaneously to break.", leftMargin, sectionStarts[2] + 14);
+    appState.context.fillText("Turn both directions simultaneously to brake.", leftMargin, sectionStarts[2] + 14);
     appState.context.fillText("Debug: " + appState.debugText, leftMargin, sectionStarts[2] + 28)
 }
 
@@ -258,20 +260,29 @@ function doKeyUp(e) {
 function processTouch(touchX, touchY) {
     // is this touch in a special region?
 
+    // touches use the window pixels, not scaled for hi DPI displays
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+
     // top left - help
-    if ((touchX < appState.windowWidth / 8) && (touchY < appState.windowHeight / 8)) {
+    if ((touchX < width / 8) && (touchY < height / 8)) {
         appState.helpDisplayed = !appState.helpDisplayed;
-    } else if (touchX < appState.windowWidth / 3) {
+    } else if (touchX < width / 3) {
         // Left Touch, turn left
         appState.turningLeft = true;
-    } else if (touchX > appState.windowWidth * 2 / 3) {
+    } else if (touchX > width * 2 / 3) {
         // Right Touch, turn right
         appState.turningRight = true;
-    } else if ((touchX > appState.windowWidth / 3) &&
-               (touchX < appState.windowWidth * 2 / 3) &&
-               (touchY < appState.windowHeight / 2) ) {
+    } else if ((touchX > width / 3) &&
+               (touchX < width * 2 / 3) &&
+               (touchY < height / 2) ) {
         //Top Center touch, toggle sound
         appState.soundEnabled = !appState.soundEnabled;
+    } else if ((touchX > width / 3) &&
+               (touchX < width * 2 / 3) &&
+               (touchY > height / 2) ) {
+        //Bottom Center touch, toggle background
+        appState.bgEnabled = !appState.bgEnabled;
     }
 }
 
@@ -340,10 +351,12 @@ function redraw() {
     // Draw next frame
 
     // Fill in background
-    appState.context.strokeStyle = appState.bg;
-    appState.context.fillStyle = appState.bg;
-    appState.context.lineWidth = '10';
-    appState.context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    if (appState.bgEnabled) {
+        appState.context.strokeStyle = appState.bg;
+        appState.context.fillStyle = appState.bg;
+        appState.context.lineWidth = '10';
+        appState.context.fillRect(0, 0, appState.windowWidth, appState.windowHeight);
+    }
 
     // Rotate for the car
     // Translate for the car display
@@ -426,11 +439,16 @@ function initialize() {
  * Handle resize events to adjust the canvas dimensions.
  */
 function resizeCanvas() {
+
+    // Determine if the dimensions are a lie
+    var backScale = backingScale(appState.context);
+
     // Recalculate canvas size
-    appState.canvas.width = window.innerWidth;
-    appState.canvas.height = window.innerHeight;
-    appState.windowHeight = window.innerHeight;
-    appState.windowWidth = window.innerWidth;
+    appState.windowHeight = window.innerHeight * backScale;
+    appState.windowWidth = window.innerWidth * backScale;
+
+    appState.canvas.width = appState.windowWidth;
+    appState.canvas.height = appState.windowHeight;
 
     // Recalculate car size
     appState.carSize = Math.min(appState.windowHeight,
@@ -441,6 +459,15 @@ function resizeCanvas() {
 
     // Redraw
     redraw();
+}
+
+function backingScale(context) {
+    if ('devicePixelRatio' in window) {
+        if (window.devicePixelRatio > 1) {
+            return window.devicePixelRatio;
+        }
+    }
+    return 1;
 }
 
 } // end startShootingStars

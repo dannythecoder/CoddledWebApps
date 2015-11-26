@@ -131,6 +131,10 @@ function generateRandomStar(star) {
  */
 function addShootingStar(startX, startY) {
 
+    // startX and startY are in screen pixels, not backing pixels
+    startX = startX * 1.0 * appState.windowWidth / window.innerWidth;
+    startY = startY * 1.0 * appState.windowHeight / window.innerHeight;
+
     // Generate the object
     var shootingStar = {
         x: startX,
@@ -295,6 +299,9 @@ function doKeyDown(e) {
 function doTouchStart(e) {
     e.preventDefault();
 
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+
     touchCount = e.targetTouches.length;
     for (var i = 0; i < touchCount; i++)
     {
@@ -303,7 +310,7 @@ function doTouchStart(e) {
 
         // is this touch in a special region?
         // top left - help
-        if ((touchX < appState.windowWidth / 8) && (touchY < appState.windowHeight / 8)) {
+        if ((touchX < width / 8) && (touchY < height / 8)) {
             appState.helpDisplayed = !appState.helpDisplayed;
         } else {
             // Queue a shooting star, beginning at this location.
@@ -344,7 +351,7 @@ function redraw() {
     appState.context.strokeStyle = appState.bg;
     appState.context.fillStyle = appState.bg;
     appState.context.lineWidth = '10';
-    appState.context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    appState.context.fillRect(0, 0, appState.windowWidth, appState.windowHeight);
 
     // Draw the stars
     var starScale = (appState.windowHeight);
@@ -419,11 +426,16 @@ function initialize() {
  * Handle resize events to adjust the canvas dimensions.
  */
 function resizeCanvas() {
+
+    // Determine if the dimensions are a lie
+    var backScale = backingScale(appState.context);
+
     // Recalculate canvas size
-    appState.canvas.width = window.innerWidth;
-    appState.canvas.height = window.innerHeight;
-    appState.windowHeight = window.innerHeight;
-    appState.windowWidth = window.innerWidth;
+    appState.windowHeight = window.innerHeight * backScale;
+    appState.windowWidth = window.innerWidth * backScale;
+
+    appState.canvas.width = appState.windowWidth;
+    appState.canvas.height = appState.windowHeight;
 
     // Recalculate star size
     appState.starSize = Math.min(appState.windowHeight,
@@ -436,6 +448,15 @@ function resizeCanvas() {
 
     // Redraw
     redraw();
+}
+
+function backingScale(context) {
+    if ('devicePixelRatio' in window) {
+        if (window.devicePixelRatio > 1) {
+            return window.devicePixelRatio;
+        }
+    }
+    return 1;
 }
 
 } // end startShootingStars
