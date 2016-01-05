@@ -61,17 +61,17 @@ function createAppState() {
 
         // Car states
         carSpeed: 0.001, // Pixels per millisecond
-        carMaxSpeed: 0.006,
+        carMaxSpeed: 0.003,
         carMinSpeed: 0.0001,
         carAcceleration: 0.000006,
-        carDirection: 0, // Radiens
+        carDirection: 0, // Radians
         carImage: carImage,
         carSize: 2.2,
         carX: 0,
         carY: 10,
 
         // Control variables
-        turnScale: 0.004, // Radiens per millisecond
+        turnScale: 0.004, // Radians per millisecond
         turningRight: false,
         turningLeft: false,
 
