@@ -1,4 +1,4 @@
-Coddled Software's Web Apps
+DannyTheCoder's Web Apps
 ===========================
 
 A collection of web apps, with a few common files.
